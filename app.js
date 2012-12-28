@@ -7,7 +7,7 @@ var express = require('express')
 	, SendGrid = require('sendgrid').SendGrid
 	, sendgrid = new SendGrid(process.env.SENDGRID_USER, process.env.SENDGRID_PW)
 	, mongodb = require('mongodb')
-	, db = new mongodb.Db(process.env.DB_NAME, new mongodb.Server(process.env.DB_SERVER, process.env.DB_PORT), {w:0} )		
+	, db = new mongodb.Db(process.env.DB_NAME, new mongodb.Server(process.env.DB_SERVER, Number(process.env.DB_PORT)), {w:0} )		
 	, SHOPIFY_KEY = process.env.SHOPIFY_KEY
 	, SHOPIFY_SECRET = process.env.SHOPIFY_SECRET
 	, PRICE = ( process.env.PRICE ? process.env.PRICE : "1.00" )
@@ -63,7 +63,7 @@ app.get('/', function(req, res) {
 							, body: {
 								"script_tag": {
 									"event": "onload",
-									"src": "http://tranquil-meadow-5666.herokuapp.com/js/contactform.js'
+									"src": "http://shopifycontactform.herokuapp.com/js/contactform.js"
 								}
 							}
 							, json:true
