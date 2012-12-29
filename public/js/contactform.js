@@ -11,7 +11,7 @@ $("body").append("<div id='ezcontact' style='position:relative; padding:5px; wid
 
 $("#ezcontactlink").live("click", function(){
 	console.log("test")
-	$("#ezcontact").toggle();return false;
+	$("#ezcontact").show();return false;
 })
 $("#ezcontactclose").live("click", function(){
 	console.log("test1")
