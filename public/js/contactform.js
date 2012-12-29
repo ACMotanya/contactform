@@ -9,10 +9,16 @@ $("body").append("<div id='ezcontact' style='position:relative; padding:5px; wid
  "<textarea style='width:280px;height:100px; font-family: Helvetica, sans-serif:font-size: 14px;color:black;' name='message' placeholder='Your Message Goes Here'></textarea><br/><input type='submit' value='Send'/></form><p style='display:none;'>Email sent, thanks!</p>"+
  "<a id='ezcontactclose' style='position:absolute;top:5px;right:5px;font-family: Helvetica, sans-serif:font-size: 14px;color:red;' href='#'>Close</a></div>")
 
-$("#ezcontactlink,#ezcontactclose").click(function(){
+$("#ezcontactlink").click(function(){
 	console.log("test")
 	$("#ezcontact").toggle();return false;
 })
+
+$("#ezcontactclose").click(function(){
+	console.log("test1")
+	$("#ezcontact").toggle();return false;
+})
+
 
 $("#ezcontact form").submit(function(e){
 	e.preventDefault();			
