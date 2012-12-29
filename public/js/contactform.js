@@ -15,7 +15,7 @@ $("#ezcontactlink,#ezcontactclose").click(function(){
 
 $("#ezcontact form").submit(function(e){
 	e.preventDefault();			
-	$.getJSON('http://localhost:3000/email'+
+	$.getJSON('http://aqueous-thicket-4736.herokuapp.com//email'+
 		'?name='+$("#ezcontact form input[name='name']").val()+
 		'&email_from='+$("#ezcontact form input[name='email_from']").val()+
 		'&message='+$("#ezcontact form textarea[name='message']").val()+
