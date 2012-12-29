@@ -10,6 +10,7 @@ $("body").append("<div id='ezcontact' style='position:relative; padding:5px; wid
  "<a id='ezcontactclose' style='position:absolute;top:5px;right:5px;font-family: Helvetica, sans-serif:font-size: 14px;color:red;' href='#'>Close</a></div>")
 
 $("#ezcontactlink,#ezcontactclose").click(function(){
+	console.log("test")
 	$("#ezcontact").toggle();return false;
 })
 
