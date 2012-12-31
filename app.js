@@ -63,7 +63,7 @@ app.get('/', function(req, res) {
 							, body: {
 								"script_tag": {
 									"event": "onload",
-									"src": "http://aqueous-thicket-4736.herokuapp.com/js/contactform.js"
+									"src": "http://shopify-contact-form/js/contactform.js"
 								}
 							}
 							, json:true
