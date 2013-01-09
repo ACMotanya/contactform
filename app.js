@@ -9,7 +9,7 @@ var express = require('express')
 	, SendGrid = require('sendgrid').SendGrid
 	, sendgrid = new SendGrid(process.env.SENDGRID_USER, process.env.SENDGRID_PW)
 	, mongodb = require('mongodb')
-	, db = new mongodb.Db('contactform', new mongodb.Server(process.env.DB_SERVER, Number(process.env.DB_PORT)), {w:0} )		
+	, db = new mongodb.Db('ContactForm', new mongodb.Server(process.env.DB_SERVER, Number(process.env.DB_PORT)), {w:0} )		
 	//environment variables are variable that are declared outside of the code. usually for security reasons
 	//it's useful to name them always in capitals so that they are easy to distinguish from local variables
 	, SHOPIFY_KEY = process.env.SHOPIFY_KEY
