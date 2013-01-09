@@ -254,3 +254,57 @@ function getAccessToken(shop, code, callback){
 	)
 }
 
+function createOneTimeCharge(shop, callback){
+	console.log('createOneTimeCharge:')
+	console.log('https://'+shop.myshopify_domain+'/admin/application_charges.json')
+	request.post({
+			url: 'https://'+shop.myshopify_domain+'/admin/application_charges.json'
+			, headers: { "X-Shopify-Access-Token" : shop.access_token }
+			, body: {
+				"application_charge": {
+					"name": "Contact Form",
+					"price": PRICE,
+					"return_url": internal_domain+"/application_charges?shop="+shop.myshopify_domain,
+					"test": !PROD_MODE							
+				}			
+			}
+			, json:true
+		}, function(req, res){
+			console.log(res.body)
+			console.log('created charge, redirect URL: ' + res.body.application_charge.confirmation_url)
+			callback(null, res.body.application_charge.confirmation_url)
+		}
+	)
+
+}
+
+function getOneTimeChargeStatus(shop, charge_id, callback){
+	console.log('getOneTimeChargeStatus')
+	console.log('https://'+shop.myshopify_domain+'/admin/application_charges/'+charge_id+'.json')
+	request.get({
+			url: 'https://'+shop.myshopify_domain+'/admin/application_charges/'+charge_id+'.json'
+			, headers: { "X-Shopify-Access-Token" : shop.access_token }
+			, json:true
+		}, function(req, res){
+			console.log(res.body)
+			if(res.body['application_charge'].status == 'accepted') {
+				callback(null, true)
+			} else {
+				callback(null, false)			
+			}
+		}
+	)
+}
+
+function activateOneTimeCharge(shop, charge_id, callback){
+	console.log('activateOneTimeCharge')
+	request.post({
+			url: 'https://'+shop.myshopify_domain+'/admin/application_charges/'+charge_id+'/activate.json'
+			, headers: { "X-Shopify-Access-Token" : shop.access_token }
+			, json:true
+		}, function(req, res){
+			console.log(res.headers.status)
+			callback(null, res.headers.status)
+		}
+	)
+}
