@@ -10,11 +10,11 @@ $("body").append("<div id='ezcontact' style='position:relative; padding:5px; wid
  "<a id='ezcontactclose' style='position:absolute;top:5px;right:5px;font-family: Helvetica, sans-serif:font-size: 14px;color:red;' href='#'>Close</a></div>")
 
 $("#ezcontactlink").live("click", function(){
-	console.log("test")
+	//console.log("test")
 	$("#ezcontact").show();return false;
 })
 $("#ezcontactclose").live("click", function(){
-	console.log("test1")
+	//console.log("test1")
 	$("#ezcontact").hide();return false;
 })
 
