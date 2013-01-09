@@ -20,11 +20,16 @@ var express = require('express')
 	//the PRICE variable defaults to "1.00" if no environment variable is available. setting PRICE to 0.00 puts the app into free mode
 	, PRICE = ( process.env.PRICE ? process.env.PRICE : "1.00" )
 
+console.log('PROD_MODE: ' + PROD_MODE)
+console.log('PRICE: ' + PRICE)
+
 //initialize the database connection
 db.open(function (err, db_p) { 
-	db.authenticate( process.env.DB_USER,  process.env.DB_PW, function(err, res){ 
-		if(err) console.log('db err: ' + res)
-	})
+	if(PROD_MODE){
+		db.authenticate( process.env.DB_USER,  process.env.DB_PW, function(err, res){ 
+			if(err) console.log('db err: ' + res)
+		})
+	}
 })
 
 //configure express, a module which handles all the web requests
