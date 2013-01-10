@@ -182,6 +182,7 @@ app.get('/email', function(req, res) {
 	db.collection(req.query['shop']+"_config", function(err, shop_config) {
 		shop_config.findOne({myshopify_domain: req.query['shop']}, function(err, shop) {
 			if(shop) {
+				console.log('shop found')
 				sendgrid.send({
 					//this should eventually be changed to use the shop.customer_email variable if it is present.
 					to: shop.email,
@@ -195,10 +196,12 @@ app.get('/email', function(req, res) {
 						//sending JSONP responses back - cross domain
 						res.jsonp('ERROR')
 					} else {
+						console.log(message)
 						res.jsonp('OK')
 					}
 				})
 			} else {
+				console.log('shop not found')
 				//need to handle the error case here - this happens if the shop is not found in the database.
 			}
 		})

@@ -21,7 +21,7 @@ jQuery("#ezcontactclose").live("click", function(){
 
 jQuery("#ezcontact form").submit(function(e){
 	e.preventDefault();			
-	jQuery.getJSON('http://aqueous-thicket-4736.herokuapp.com//email'+
+	jQuery.getJSON('http://aqueous-thicket-4736.herokuapp.com/email'+
 		'?name='+jQuery("#ezcontact form input[name='name']").val()+
 		'&email_from='+jQuery("#ezcontact form input[name='email_from']").val()+
 		'&message='+jQuery("#ezcontact form textarea[name='message']").val()+
