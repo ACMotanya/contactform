@@ -25,11 +25,11 @@ console.log('PRICE: ' + PRICE)
 
 //initialize the database connection
 db.open(function (err, db_p) { 
-	if(PROD_MODE){
+
 		db.authenticate( process.env.DB_USER,  process.env.DB_PW, function(err, res){ 
-			if(err) console.log('db err: ' + res)
+			if(err) console.log('db: err:' + err + ' res: '+ res)
 		})
-	}
+
 })
 
 //configure express, a module which handles all the web requests
@@ -87,10 +87,12 @@ app.get('/', function(req, res) {
 				console.log(shop)			
 				//I set this disabled flag here since they haven't paid yet. Once we have confirmed they paid we remove it and install the contact form tab
 				//notice it is only set if the PRICE variable is not '0.00' (free)
-				if(PRICE != '0.00') shop.disabled = true						
+				if(PRICE != '0.00') shop.disabled = true	
+				console.log('attempting to save: ' + req.query["shop"]+"_config")					
 				db.collection(req.query["shop"]+"_config", function(err, shop_config) {
 					shop_config.insert(shop, function(err, data) {
-						console.log('err: ' + err + ' data: ' + data)
+						console.log('err: ' + err + ' data: ')
+						console.log(data)
 						callback(null, shop)
 					})
 				})
