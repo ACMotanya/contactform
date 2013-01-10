@@ -19,12 +19,21 @@ var express = require('express')
 	, PROD_MODE = ( process.env.NODE_ENV ? true : false )	
 	//the PRICE variable defaults to "1.00" if no environment variable is available. setting PRICE to 0.00 puts the app into free mode
 	, PRICE = ( process.env.PRICE ? process.env.PRICE : "1.00" )
+<<<<<<< HEAD
 console.log('PROD_MODE:'+ 'PROD_MODE')
+=======
+
+console.log('PROD_MODE: ' + PROD_MODE)
+console.log('PRICE: ' + PRICE)
+
+>>>>>>> ba4c27033d4092d0f2280940ea04a86918c8425e
 //initialize the database connection
 db.open(function (err, db_p) { 
-	db.authenticate( process.env.DB_USER,  process.env.DB_PW, function(err, res){ 
-		if(err) console.log('db err: ' + res)
-	})
+
+		db.authenticate( process.env.DB_USER,  process.env.DB_PW, function(err, res){ 
+			if(err) console.log('db: err:' + err + ' res: '+ res)
+		})
+
 })
 
 //configure express, a module which handles all the web requests
@@ -82,10 +91,12 @@ app.get('/', function(req, res) {
 				console.log(shop)			
 				//I set this disabled flag here since they haven't paid yet. Once we have confirmed they paid we remove it and install the contact form tab
 				//notice it is only set if the PRICE variable is not '0.00' (free)
-				if(PRICE != '0.00') shop.disabled = true						
+				if(PRICE != '0.00') shop.disabled = true	
+				console.log('attempting to save: ' + req.query["shop"]+"_config")					
 				db.collection(req.query["shop"]+"_config", function(err, shop_config) {
 					shop_config.insert(shop, function(err, data) {
-						console.log('err: ' + err + ' data: ' + data)
+						console.log('err: ' + err + ' data: ')
+						console.log(data)
 						callback(null, shop)
 					})
 				})
@@ -177,6 +188,7 @@ app.get('/email', function(req, res) {
 	db.collection(req.query['shop']+"_config", function(err, shop_config) {
 		shop_config.findOne({myshopify_domain: req.query['shop']}, function(err, shop) {
 			if(shop) {
+				console.log('shop found')
 				sendgrid.send({
 					//this should eventually be changed to use the shop.customer_email variable if it is present.
 					to: shop.email,
@@ -190,10 +202,12 @@ app.get('/email', function(req, res) {
 						//sending JSONP responses back - cross domain
 						res.jsonp('ERROR')
 					} else {
+						console.log(message)
 						res.jsonp('OK')
 					}
 				})
 			} else {
+				console.log('shop not found')
 				//need to handle the error case here - this happens if the shop is not found in the database.
 			}
 		})
