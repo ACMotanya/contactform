@@ -110,8 +110,29 @@ app.get('/', function(req, res) {
 			} else {
 				console.log('app is in free mode')			
 				//app is in free mode so just install script and go straight to the index page
-				installScriptTag(shop, function(err, data) {
-					res.render("index",{ locals:{installed:true}})
+				getScriptTags(shop, function(err, data){
+					console.log('number of scripttags currently installed: ' + data["script_tags"].length >1)
+					if(data["script_tags"].length >1 ) {
+						//length is greater than 1 which means script is already installed, so don't install again but remove any extras
+						console.log('script tags greater than 1!')
+						for(var i=1;i<=data["script_tags"].length;i++){
+							console.log('deleting extra: '+data["script_tags"][i].id)
+							deleteScriptTag(shop, data["script_tags"][i].id)
+							i++
+						}
+						res.render("index",{ locals:{installed:true}})
+
+					} else if(data["script_tags"].length ==0 ) {
+						console.log('script tags zero!')					
+						installScriptTag(shop, function(err, data) {
+							//console.log(data)
+							res.render("index",{ locals:{installed:true}})
+						})
+					
+					} else {
+						console.log('script tags 1!')
+						res.render("index",{ locals:{installed:true}})					
+					}
 				})
 			}
 		})
@@ -232,6 +253,36 @@ function installScriptTag(shop, callback){
 			//eventually there should be real error-checking here, doing a callback(null) 
 			//in the meantime which assumes there was no error installing the scriptTags
 			callback(null, res.body)
+	})	
+}
+
+function getScriptTags(shop, callback){
+	console.log('getScriptTags:')
+	console.log('https://'+shop.myshopify_domain+'/admin/script_tags.json?src=http://aqueous-thicket-4736.herokuapp.com/js/contactform.js')
+	request.get({
+		url: 'https://'+shop.myshopify_domain+'/admin/script_tags.json?src=http://aqueous-thicket-4736.herokuapp.com/js/contactform.js'
+		, headers: { "X-Shopify-Access-Token" : shop.access_token }
+		, json:true
+		}, function(req, res){
+			//this line shows the response from the Shopify API
+			console.log('response from getScriptTags:')
+			console.log(res.body)
+			callback(null, res.body)
+	})	
+}
+
+function deleteScriptTag(shop, scripttag_id, callback){
+	console.log('deleteScriptTag:')
+	console.log('https://'+shop.myshopify_domain+'/admin/script_tags/'+scripttag_id+'.json')
+	request.del({
+		url: 'https://'+shop.myshopify_domain+'/admin/script_tags/'+scripttag_id+'.json'
+		, headers: { "X-Shopify-Access-Token" : shop.access_token }
+		, json:true
+		}, function(req, res){
+			//this line shows the response from the Shopify API
+			console.log('response from deleteScriptTag:')
+			console.log(res.body)
+			//callback(null, res.body)
 	})	
 }
 
