@@ -123,6 +123,7 @@ app.get('/', function(req, res) {
 						res.render("index",{ locals:{installed:true}})
 
 					} else if(data["script_tags"].length ==0 ) {
+						// no script tags are installed so we can assume this is a brand new install and just add one script tag
 						console.log('script tags zero!')					
 						installScriptTag(shop, function(err, data) {
 							//console.log(data)
@@ -130,6 +131,7 @@ app.get('/', function(req, res) {
 						})
 					
 					} else {
+						// one script tag already exists so this is just the user logging into the app again, so we dont install any more script tags 
 						console.log('script tags 1!')
 						res.render("index",{ locals:{installed:true}})					
 					}
