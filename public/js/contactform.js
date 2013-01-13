@@ -33,5 +33,8 @@ jQuery("#ezcontact form").submit(function(e){
 		jQuery("#ezcontact").toggle()
 	},1000)  				
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 828bd6fe05e10c7119d847154f86dc3171537fcd
 })
