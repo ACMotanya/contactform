@@ -247,7 +247,7 @@ app.get('/email', function(req, res) {
                    res.send(200)
                    })
                   } else {
-				console.log('shop not found')
+					console.log('shop not found')
 				//need to handle the error case here - this happens if the shop is not found in the database.
 			}
 		})
