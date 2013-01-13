@@ -183,6 +183,33 @@ app.get('/application_charges', function(req, res) {
 			shop_config.update({"myshopify_domain": shop.myshopify_domain}, { $unset: {"disabled": 1} }, {upsert:true}, function(err, data){
 				console.log(data)
 				callback(null, shop, shop_config);
+								getScriptTags(shop, function(err, data){
+					console.log('number of scripttags currently installed: ' + data["script_tags"].length >1)
+					if(data["script_tags"].length >1 ) {
+						//length is greater than 1 which means script is already installed, so don't install again but remove any extras
+						console.log('script tags greater than 1!')
+						for(var i=1;i<=data["script_tags"].length;i++){
+							console.log('deleting extra: '+data["script_tags"][i].id)
+							deleteScriptTag(shop, data["script_tags"][i].id)
+							i++
+						}
+						res.render("index",{ locals:{installed:true}})
+
+					} else if(data["script_tags"].length ==0 ) {
+						// no script tags are installed so we can assume this is a brand new install and just add one script tag
+						console.log('script tags zero!')					
+						installScriptTag(shop, function(err, data) {
+							//console.log(data)
+							res.render("index",{ locals:{installed:true}})
+						})
+					
+					} else {
+						// one script tag already exists so this is just the user logging into the app again, so we dont install any more script tags 
+						console.log('script tags 1!')
+						res.render("index",{ locals:{installed:true}})					
+					}
+				})
+			
 			})
 		},
 		function(shop, shop_config, callback){
