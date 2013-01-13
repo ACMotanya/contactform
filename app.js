@@ -220,10 +220,10 @@ app.get('/email', function(req, res) {
 					if (!success) {
 						console.log(message);
 						//sending JSONP responses back - cross domain
-						res.jsonp({"status": "ERROR"})
+						res.jsonp(200, {"status": "ERROR"})
 					} else {
 						console.log(message)
-						res.jsonp({"status": "OK"})
+						res.jsonp(200, {"status": "OK"})
 					}
 				})
 			} else {
