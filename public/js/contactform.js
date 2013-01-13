@@ -28,7 +28,7 @@ jQuery("#ezcontact form").submit(function(e){
 		'&shop='+Shopify.shop+
 		'&callback=?').done(
 		function(response) {
-			if(response == 'OK') {
+			if(response.status == 'OK') {
 				jQuery("#ezcontact p").show()
 				setTimeout(function(){
 					jQuery("#ezcontact p").hide()
