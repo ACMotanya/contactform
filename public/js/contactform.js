@@ -21,21 +21,17 @@ jQuery("#ezcontactclose").live("click", function(){
 
 jQuery("#ezcontact form").submit(function(e){
 	e.preventDefault();			
-	jQuery.getJSON('http://aqueous-thicket-4736.herokuapp.com/email'+
+	jQuery.get('http://aqueous-thicket-4736.herokuapp.com/email'+
 		'?name='+jQuery("#ezcontact form input[name='name']").val()+
 		'&email_from='+jQuery("#ezcontact form input[name='email_from']").val()+
 		'&message='+jQuery("#ezcontact form textarea[name='message']").val()+
-		'&shop='+Shopify.shop+
-		'&callback=?').done(
-		function(response) {
-			if(response == 'OK') {
-				jQuery("#ezcontact p").show()
-				setTimeout(function(){
-					jQuery("#ezcontact p").hide()
-					jQuery("#ezcontact").toggle()
-				},1000		
-				)  				
-			}
-		}
-	)
+		'&shop='+Shopify.shop)
+
+	jQuery("#ezcontact p").show()
+	setTimeout(function(){
+		jQuery("#ezcontact p").hide()
+		jQuery("#ezcontact").toggle()
+	},1000)  				
+
+
 })
