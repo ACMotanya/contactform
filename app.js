@@ -217,14 +217,7 @@ app.get('/email', function(req, res) {
 					subject: 'Message from your contact form',
 					text: req.query['message']
 				}, function(success, message) {
-					if (!success) {
-						console.log(message);
-						//sending JSONP responses back - cross domain
-						res.jsonp(200, {"status": "ERROR"})
-					} else {
-						console.log(message)
-						res.jsonp(200, {"status": "OK"})
-					}
+					res.send(200)
 				})
 			} else {
 				console.log('shop not found')
