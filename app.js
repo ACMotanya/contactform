@@ -9,11 +9,7 @@ var express = require('express')
 	, SendGrid = require('sendgrid').SendGrid
 	, sendgrid = new SendGrid(process.env.SENDGRID_USER, process.env.SENDGRID_PW)
 	, mongodb = require('mongodb')
-<<<<<<< HEAD
-	, db = new mongodb.Db('ContactForm', new mongodb.Server(process.env.DB_SERVER, Number(process.env.DB_PORT)), {w:0} )		
-=======
 	, db = new mongodb.Db(process.env.DB_NAME, new mongodb.Server(process.env.DB_SERVER, Number(process.env.DB_PORT)), {w:0} )		
->>>>>>> 4c2eb5904d52aa8fa4594470da33ab9d3b9dde9c
 	//environment variables are variable that are declared outside of the code. usually for security reasons
 	//it's useful to name them always in capitals so that they are easy to distinguish from local variables
 	, SHOPIFY_KEY = process.env.SHOPIFY_KEY
@@ -23,14 +19,11 @@ var express = require('express')
 	, PROD_MODE = ( process.env.NODE_ENV ? true : false )	
 	//the PRICE variable defaults to "1.00" if no environment variable is available. setting PRICE to 0.00 puts the app into free mode
 	, PRICE = ( process.env.PRICE ? process.env.PRICE : "1.00" )
-<<<<<<< HEAD
-console.log('PROD_MODE:'+ 'PROD_MODE')
-=======
 
 console.log('PROD_MODE: ' + PROD_MODE)
 console.log('PRICE: ' + PRICE)
 
->>>>>>> ba4c27033d4092d0f2280940ea04a86918c8425e
+
 //initialize the database connection
 db.open(function (err, db_p) { 
 
