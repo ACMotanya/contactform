@@ -3,7 +3,11 @@
 	<h3>The Easiest Contact Form for Shopify</h3>
 	
 	<hr/>
+	<% if(typeof installed != 'undefined' ){ %>
+		<p>Thank you for installing!</p>
+	<% } else { %>
 	<p><a href="http://apps.shopify.com/quick-contact-form"><button class="btn btn-primary btn-large" type="submit">Install now!</button></a></p>
+	<% } %>
 </div>
 <p class="lead"> The days of giving clients your email address are long gone. 
 	Nowadays, contact forms are far more convenient way for people to get in touch with a company. 

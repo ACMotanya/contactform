@@ -26,11 +26,11 @@ console.log('PRICE: ' + PRICE)
 
 //initialize the database connection
 db.open(function (err, db_p) { 
-
+	if(PROD_MODE){
 		db.authenticate( process.env.DB_USER,  process.env.DB_PW, function(err, res){ 
 			if(err) console.log('db: err:' + err + ' res: '+ res)
 		})
-
+	}
 })
 
 //configure express, a module which handles all the web requests
@@ -61,85 +61,101 @@ app.get('/', function(req, res) {
 		res.redirect('https://'+req.query["shop"]+'/admin/oauth/authorize?client_id='+SHOPIFY_KEY+'&scope=read_script_tags,write_script_tags')
 	//the user has now confirmed the installation, time to start the installation process
 	} else if(req.query["shop"] && req.query['code']) {		
-		
-		var shop = new Object()
-		shop.myshopify_domain = req.query["shop"]
-		
-		//using the async module to help do a waterfall control flow
-		//it makes the code a bit easier to read and understand, rather than having a lot of nested callbacks
-		async.waterfall([
-			function(callback){
-				console.log(shop)			
-				getAccessToken(shop, req.query['code'], function(err, data) {
-					shop.access_token = data
-					callback(null, shop)
-				})
-			},
-			function(shop, callback){
-				console.log(shop)			
-				getShopInfo(shop, function(err, data){
-					var temp_access_token = shop.access_token
-					shop = data
-					shop.access_token = temp_access_token
-					callback(null, shop)
-				})
-			},
-			function(shop, callback){
-				console.log(shop)			
-				//I set this disabled flag here since they haven't paid yet. Once we have confirmed they paid we remove it and install the contact form tab
-				//notice it is only set if the PRICE variable is not '0.00' (free)
-				if(PRICE != '0.00') shop.disabled = true	
-				console.log('attempting to save: ' + req.query["shop"]+"_config")					
-				db.collection(req.query["shop"]+"_config", function(err, shop_config) {
-					shop_config.insert(shop, function(err, data) {
-						console.log('err: ' + err + ' data: ')
-						console.log(data)
-						callback(null, shop)
-					})
-				})
-			}
-		], function (err, result) {
-			console.log('waterfall done!')
-			console.log(result)
-			if(PRICE != '0.00') {
-				console.log('not in free mode, creating charge')
-				//app is in charge mode so create an app charge
-				createOneTimeCharge(shop, function(err, data){
-					//redirect the user to confirm the app charge
-					res.redirect(data)
-				})			 
-			} else {
-				console.log('app is in free mode')			
-				//app is in free mode so just install script and go straight to the index page
-				getScriptTags(shop, function(err, data){
-					console.log('number of scripttags currently installed: ' + data["script_tags"].length >1)
-					if(data["script_tags"].length >1 ) {
-						//length is greater than 1 which means script is already installed, so don't install again but remove any extras
-						console.log('script tags greater than 1!')
-						for(var i=1;i<=data["script_tags"].length;i++){
-							console.log('deleting extra: '+data["script_tags"][i].id)
-							deleteScriptTag(shop, data["script_tags"][i].id)
-							i++
-						}
-						res.render("index",{ locals:{installed:true}})
 
-					} else if(data["script_tags"].length ==0 ) {
-						// no script tags are installed so we can assume this is a brand new install and just add one script tag
-						console.log('script tags zero!')					
-						installScriptTag(shop, function(err, data) {
-							//console.log(data)
-							res.render("index",{ locals:{installed:true}})
-						})
-					
-					} else {
-						// one script tag already exists so this is just the user logging into the app again, so we dont install any more script tags 
-						console.log('script tags 1!')
-						res.render("index",{ locals:{installed:true}})					
-					}
-				})
-			}
-		})
+		db.collection(req.query["shop"]+"_config", function(err, shop_config) {
+			shop_config.findOne({myshopify_domain: req.query["shop"]}, function(err, shop_installed) {
+				if(!shop_installed){
 		
+					var shop = new Object()
+					shop.myshopify_domain = req.query["shop"]
+					
+					//using the async module to help do a waterfall control flow
+					//it makes the code a bit easier to read and understand, rather than having a lot of nested callbacks
+					async.waterfall([
+						function(callback){
+							console.log(shop)			
+							getAccessToken(shop, req.query['code'], function(err, data) {
+								shop.access_token = data
+								callback(null, shop)
+							})
+						},
+						function(shop, callback){
+							console.log(shop)			
+							getShopInfo(shop, function(err, data){
+								var temp_access_token = shop.access_token
+								shop = data
+								shop.access_token = temp_access_token
+								callback(null, shop)
+							})
+						},
+						function(shop, callback){
+							console.log(shop)			
+							//I set this disabled flag here since they haven't paid yet. Once we have confirmed they paid we remove it and install the contact form tab
+							//notice it is only set if the PRICE variable is not '0.00' (free)
+							if(PRICE != '0.00') shop.disabled = true	
+							console.log('attempting to save: ' + req.query["shop"]+"_config")					
+							db.collection(req.query["shop"]+"_config", function(err, shop_config) {
+								shop_config.insert(shop, function(err, data) {
+									console.log('err: ' + err + ' data: ')
+									console.log(data)
+									callback(null, shop)
+								})
+							})
+						}
+					], function (err, result) {
+						console.log('waterfall done!')
+						console.log(result)
+						if(err) {
+							console.log('SHOP already installed !!!')
+							res.render("index",{ locals:{installed:true}})
+						} else {
+							if(PRICE != '0.00') {
+								console.log('not in free mode, creating charge')
+								//app is in charge mode so create an app charge
+								createOneTimeCharge(shop, function(err, data){
+									//redirect the user to confirm the app charge
+									res.redirect(data)
+								})			 
+							} else {
+								console.log('app is in free mode')			
+								//app is in free mode so just install script and go straight to the index page
+								getScriptTags(shop, function(err, data){
+									console.log('number of scripttags currently installed: ' + data["script_tags"].length >1)
+									if(data["script_tags"].length >1 ) {
+										//length is greater than 1 which means script is already installed, so don't install again but remove any extras
+										console.log('script tags greater than 1!')
+										for(var i=1;i<=data["script_tags"].length;i++){
+											console.log('deleting extra: '+data["script_tags"][i].id)
+											deleteScriptTag(shop, data["script_tags"][i].id)
+											i++
+										}
+										res.render("index",{ locals:{installed:true}})
+				
+									} else if(data["script_tags"].length ==0 ) {
+										// no script tags are installed so we can assume this is a brand new install and just add one script tag
+										console.log('script tags zero!')					
+										installScriptTag(shop, function(err, data) {
+											//console.log(data)
+											res.render("index",{ locals:{installed:true}})
+										})
+									
+									} else {
+										// one script tag already exists so this is just the user logging into the app again, so we dont install any more script tags 
+										console.log('script tags 1!')
+										res.render("index",{ locals:{installed:true}})					
+									}
+								})
+							}
+						}
+					})
+					
+				} else {
+					console.log('shop is already installed!!!!!!!!!!!!!!!!!')
+					res.render("index",{ locals:{installed:true}})							
+				}
+			})
+		})
+
 	} else {
 		res.render("index")
 	}
