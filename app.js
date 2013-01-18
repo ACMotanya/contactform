@@ -18,7 +18,7 @@ var express = require('express')
 	, internal_domain = ( process.env.NODE_ENV ? 'http://aqueous-thicket-4736.herokuapp.com' : 'http://localhost:3000' )	
 	, PROD_MODE = ( process.env.NODE_ENV ? true : false )	
 	//the PRICE variable defaults to "1.00" if no environment variable is available. setting PRICE to 0.00 puts the app into free mode
-	, PRICE = ( process.env.PRICE ? process.env.PRICE : "1.00" )
+	, PRICE = ( process.env.PRICE ? process.env.PRICE : "7.50" )
 
 console.log('PROD_MODE: ' + PROD_MODE)
 console.log('PRICE: ' + PRICE)
@@ -92,7 +92,7 @@ app.get('/', function(req, res) {
 							console.log(shop)			
 							//I set this disabled flag here since they haven't paid yet. Once we have confirmed they paid we remove it and install the contact form tab
 							//notice it is only set if the PRICE variable is not '0.00' (free)
-							if(PRICE != '0.00') shop.disabled = true	
+							if(PRICE != '7.50') shop.disabled = true	
 							console.log('attempting to save: ' + req.query["shop"]+"_config")					
 							db.collection(req.query["shop"]+"_config", function(err, shop_config) {
 								shop_config.insert(shop, function(err, data) {
@@ -109,7 +109,7 @@ app.get('/', function(req, res) {
 							console.log('SHOP already installed !!!')
 							res.render("index",{ locals:{installed:true}})
 						} else {
-							if(PRICE != '0.00') {
+							if(PRICE != '7.50') {
 								console.log('not in free mode, creating charge')
 								//app is in charge mode so create an app charge
 								createOneTimeCharge(shop, function(err, data){
