@@ -14,6 +14,7 @@ var express = require('express')
 	//it's useful to name them always in capitals so that they are easy to distinguish from local variables
 	, SHOPIFY_KEY = process.env.SHOPIFY_KEY
 	, SHOPIFY_SECRET = process.env.SHOPIFY_SECRET
+
 	, domain = ( process.env.NODE_ENV ? 'http://aqueous-thicket-4736.herokuapp.com' : 'http://76.105.146.159:3000' )	
 	, internal_domain = ( process.env.NODE_ENV ? 'http://aqueous-thicket-4736.herokuapp.com' : 'http://localhost:3000' )	
 	, PROD_MODE = ( process.env.NODE_ENV ? true : false )	
@@ -58,10 +59,13 @@ app.get('/', function(req, res) {
 	//shop parameter is present, but not the code param. this means that the user is initiating the installation
 	if(req.query["shop"] && !req.query['code']) {
 		//we redirect them to a page where they either confirm or cancel the installation. confirming it redirects them back to this page, but with a code param
-		res.redirect('https://'+req.query["shop"]+'/admin/oauth/authorize?client_id='+SHOPIFY_KEY+'&scope=read_script_tags,write_script_tags')
+					var free = ""
+					if( req.query["free"] == "true" ) free = "?free=true"
+
+		res.redirect('https://'+req.query["shop"]+'/admin/oauth/authorize?client_id='+SHOPIFY_KEY+'&scope=read_script_tags,write_script_tags&redirect_uri='+internal_domain+'/'+free)
 	//the user has now confirmed the installation, time to start the installation process
 	} else if(req.query["shop"] && req.query['code']) {		
-
+		console.log(req.query)
 		db.collection(req.query["shop"]+"_config", function(err, shop_config) {
 			shop_config.findOne({myshopify_domain: req.query["shop"]}, function(err, shop_installed) {
 				if(!shop_installed){
@@ -92,7 +96,7 @@ app.get('/', function(req, res) {
 							console.log(shop)			
 							//I set this disabled flag here since they haven't paid yet. Once we have confirmed they paid we remove it and install the contact form tab
 							//notice it is only set if the PRICE variable is not '0.00' (free)
-							if(PRICE != '3.50') shop.disabled = true	
+							if(PRICE != '0.00') shop.disabled = true	
 							console.log('attempting to save: ' + req.query["shop"]+"_config")					
 							db.collection(req.query["shop"]+"_config", function(err, shop_config) {
 								shop_config.insert(shop, function(err, data) {
@@ -109,7 +113,7 @@ app.get('/', function(req, res) {
 							console.log('SHOP already installed !!!')
 							res.render("index",{ locals:{installed:true}})
 						} else {
-							if(PRICE != '7.50') {
+							if(PRICE != '0.00' && !req.query['free']) {
 								console.log('not in free mode, creating charge')
 								//app is in charge mode so create an app charge
 								createOneTimeCharge(shop, function(err, data){
