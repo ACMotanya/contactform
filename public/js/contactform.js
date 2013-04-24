@@ -1,7 +1,7 @@
 jQuery("body").append("<div id='ezcontactlink' style='"+
  "-webkit-transform: rotate(-90deg); -moz-transform: rotate(-90deg); -ms-transform: rotate(-90deg); -o-transform: rotate(-90deg);"+
  "-webkit-transform-origin: top left; -moz-transform-origin: top left; -ms-transform-origin: top left; -o-transform-origin: top left;"+ 
-  "filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);"+
+  "filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=2);"+
 "border:2px solid black;-moz-border-radius: 3px;border-radius: 3px;background: white;padding: 2px;position:fixed;z-index:99999;top:150px;left:0px;width:75px;height:20px"+
 "'><a style='font-family: Helvetica, sans-serif;font-size:14px; color:black;' href='javascript:showezcontact();'>Contact Us</a></div>")		
 jQuery("body").append("<div id='ezcontact' style='position:relative; padding:5px; width: 300px;border:5px solid black;-moz-border-radius: 15px;border-radius: 15px;display:none;position:fixed;"+
