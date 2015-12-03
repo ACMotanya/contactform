@@ -1,38 +1,38 @@
 //These are all your config variables
-var express = require('express')
-  , partials = require('express-partials')
-  , app = express()
-  , http = require('http')
-  , path = require('path')
-  , async = require('async')
-  , request = require('request')
-	, SendGrid = require('sendgrid').SendGrid
-	, sendgrid = new SendGrid(process.env.SENDGRID_USER, process.env.SENDGRID_PW)
-	, mongodb = require('mongodb')
-	, db = new mongodb.Db(process.env.DB_NAME, new mongodb.Server(process.env.DB_SERVER, Number(process.env.DB_PORT)), {w:0} )
-	//environment variables are variable that are declared outside of the code. usually for security reasons
-	//it's useful to name them always in capitals so that they are easy to distinguish from local variables
-	, SHOPIFY_KEY = process.env.SHOPIFY_KEY
-	, SHOPIFY_SECRET = process.env.SHOPIFY_SECRET
+var express = require('express'),
+    partials = require('express-partials'),
+    app = express(),
+    http = require('http'),
+    path = require('path'),
+    async = require('async'),
+    request = require('request'),
+    SendGrid = require('sendgrid').SendGrid,
+    sendgrid = new SendGrid(process.env.SENDGRID_USER, process.env.SENDGRID_PW),
+    mongodb = require('mongodb'),
+    db = new mongodb.Db(process.env.DB_NAME, new mongodb.Server(process.env.DB_SERVER, Number(process.env.DB_PORT)), {w:0} ),
+  	//environment variables are variable that are declared outside of the code. usually for security reasons
+  	//it's useful to name them always in capitals so that they are easy to distinguish from local variables
+  	SHOPIFY_KEY = process.env.SHOPIFY_KEY,
+    SHOPIFY_SECRET = process.env.SHOPIFY_SECRET,
 
-	, domain = ( process.env.NODE_ENV ? 'http://aqueous-thicket-4736.herokuapp.com' : 'http://76.105.146.159:3000' )
-	, internal_domain = ( process.env.NODE_ENV ? 'http://aqueous-thicket-4736.herokuapp.com' : 'http://localhost:3000' )
-	, PROD_MODE = ( process.env.NODE_ENV ? true : false )
-	//the PRICE variable defaults to "1.00" if no environment variable is available. setting PRICE to 0.00 puts the app into free mode
-	, PRICE = ( process.env.PRICE ? process.env.PRICE : "0.00" )
+    domain = ( process.env.NODE_ENV ? 'http://aqueous-thicket-4736.herokuapp.com' : 'http://76.105.146.159:3000' ),
+    internal_domain = ( process.env.NODE_ENV ? 'http://aqueous-thicket-4736.herokuapp.com' : 'http://localhost:3000' ),
+    PROD_MODE = ( process.env.NODE_ENV ? true : false ),
+  	//the PRICE variable defaults to "1.00" if no environment variable is available. setting PRICE to 0.00 puts the app into free mode
+  	PRICE = ( process.env.PRICE ? process.env.PRICE : "0.00" );
 
-console.log('PROD_MODE: ' + PROD_MODE)
-console.log('PRICE: ' + PRICE)
+console.log('PROD_MODE: ' + PROD_MODE);
+console.log('PRICE: ' + PRICE);
 
 
 //initialize the database connection
 db.open(function (err, db_p) {
 	if(PROD_MODE){
 		db.authenticate( process.env.DB_USER,  process.env.DB_PW, function(err, res){
-			if(err) console.log('db: err:' + err + ' res: '+ res)
-		})
+			if(err) console.log('db: err:' + err + ' res: '+ res);
+		});
 	}
-})
+});
 
 //configure express, a module which handles all the web requests
 app.configure(function(){
@@ -151,7 +151,7 @@ app.get('/', function(req, res) {
 								})
 							}
 						}
-					})		
+					})
 				} else {
 					console.log('shop is already installed!!!!!!!!!!!!!!!!!')
 					res.render("index",{ locals:{installed:true}})
