@@ -9,15 +9,15 @@ var express = require('express')
 	, SendGrid = require('sendgrid').SendGrid
 	, sendgrid = new SendGrid(process.env.SENDGRID_USER, process.env.SENDGRID_PW)
 	, mongodb = require('mongodb')
-	, db = new mongodb.Db(process.env.DB_NAME, new mongodb.Server(process.env.DB_SERVER, Number(process.env.DB_PORT)), {w:0} )		
+	, db = new mongodb.Db(process.env.DB_NAME, new mongodb.Server(process.env.DB_SERVER, Number(process.env.DB_PORT)), {w:0} )
 	//environment variables are variable that are declared outside of the code. usually for security reasons
 	//it's useful to name them always in capitals so that they are easy to distinguish from local variables
 	, SHOPIFY_KEY = process.env.SHOPIFY_KEY
 	, SHOPIFY_SECRET = process.env.SHOPIFY_SECRET
 
-	, domain = ( process.env.NODE_ENV ? 'http://aqueous-thicket-4736.herokuapp.com' : 'http://76.105.146.159:3000' )	
-	, internal_domain = ( process.env.NODE_ENV ? 'http://aqueous-thicket-4736.herokuapp.com' : 'http://localhost:3000' )	
-	, PROD_MODE = ( process.env.NODE_ENV ? true : false )	
+	, domain = ( process.env.NODE_ENV ? 'http://aqueous-thicket-4736.herokuapp.com' : 'http://76.105.146.159:3000' )
+	, internal_domain = ( process.env.NODE_ENV ? 'http://aqueous-thicket-4736.herokuapp.com' : 'http://localhost:3000' )
+	, PROD_MODE = ( process.env.NODE_ENV ? true : false )
 	//the PRICE variable defaults to "1.00" if no environment variable is available. setting PRICE to 0.00 puts the app into free mode
 	, PRICE = ( process.env.PRICE ? process.env.PRICE : "0.00" )
 
@@ -26,9 +26,9 @@ console.log('PRICE: ' + PRICE)
 
 
 //initialize the database connection
-db.open(function (err, db_p) { 
+db.open(function (err, db_p) {
 	if(PROD_MODE){
-		db.authenticate( process.env.DB_USER,  process.env.DB_PW, function(err, res){ 
+		db.authenticate( process.env.DB_USER,  process.env.DB_PW, function(err, res){
 			if(err) console.log('db: err:' + err + ' res: '+ res)
 		})
 	}
@@ -64,27 +64,27 @@ app.get('/', function(req, res) {
 
 		res.redirect('https://'+req.query["shop"]+'/admin/oauth/authorize?client_id='+SHOPIFY_KEY+'&scope=read_script_tags,write_script_tags&redirect_uri='+internal_domain+'/'+free)
 	//the user has now confirmed the installation, time to start the installation process
-	} else if(req.query["shop"] && req.query['code']) {		
+	} else if(req.query["shop"] && req.query['code']) {
 		console.log(req.query)
 		db.collection(req.query["shop"]+"_config", function(err, shop_config) {
 			shop_config.findOne({myshopify_domain: req.query["shop"]}, function(err, shop_installed) {
 				if(!shop_installed){
-		
+
 					var shop = new Object()
 					shop.myshopify_domain = req.query["shop"]
-					
+
 					//using the async module to help do a waterfall control flow
 					//it makes the code a bit easier to read and understand, rather than having a lot of nested callbacks
 					async.waterfall([
 						function(callback){
-							console.log(shop)			
+							console.log(shop)
 							getAccessToken(shop, req.query['code'], function(err, data) {
 								shop.access_token = data
 								callback(null, shop)
 							})
 						},
 						function(shop, callback){
-							console.log(shop)			
+							console.log(shop)
 							getShopInfo(shop, function(err, data){
 								var temp_access_token = shop.access_token
 								shop = data
@@ -93,11 +93,11 @@ app.get('/', function(req, res) {
 							})
 						},
 						function(shop, callback){
-							console.log(shop)			
+							console.log(shop)
 							//I set this disabled flag here since they haven't paid yet. Once we have confirmed they paid we remove it and install the contact form tab
 							//notice it is only set if the PRICE variable is not '0.00' (free)
-							if(PRICE != '0.00') shop.disabled = true	
-							console.log('attempting to save: ' + req.query["shop"]+"_config")					
+							if(PRICE != '0.00') shop.disabled = true
+							console.log('attempting to save: ' + req.query["shop"]+"_config")
 							db.collection(req.query["shop"]+"_config", function(err, shop_config) {
 								shop_config.insert(shop, function(err, data) {
 									console.log('err: ' + err + ' data: ')
@@ -119,9 +119,9 @@ app.get('/', function(req, res) {
 								createOneTimeCharge(shop, function(err, data){
 									//redirect the user to confirm the app charge
 									res.redirect(data)
-								})			 
+								})
 							} else {
-								console.log('app is in free mode')			
+								console.log('app is in free mode')
 								//app is in free mode so just install script and go straight to the index page
 								getScriptTags(shop, function(err, data){
 									console.log('number of scripttags currently installed: ' + data["script_tags"].length >1)
@@ -134,28 +134,27 @@ app.get('/', function(req, res) {
 											i++
 										}
 										res.render("index",{ locals:{installed:true}})
-				
+
 									} else if(data["script_tags"].length ==0 ) {
 										// no script tags are installed so we can assume this is a brand new install and just add one script tag
-										console.log('script tags zero!')					
+										console.log('script tags zero!')
 										installScriptTag(shop, function(err, data) {
 											//console.log(data)
 											res.render("index",{ locals:{installed:true}})
 										})
-									
+
 									} else {
-										// one script tag already exists so this is just the user logging into the app again, so we dont install any more script tags 
+										// one script tag already exists so this is just the user logging into the app again, so we dont install any more script tags
 										console.log('script tags 1!')
-										res.render("index",{ locals:{installed:true}})					
+										res.render("index",{ locals:{installed:true}})
 									}
 								})
 							}
 						}
-					})
-					
+					})		
 				} else {
 					console.log('shop is already installed!!!!!!!!!!!!!!!!!')
-					res.render("index",{ locals:{installed:true}})							
+					res.render("index",{ locals:{installed:true}})
 				}
 			})
 		})
@@ -174,9 +173,9 @@ app.get('/application_charges', function(req, res) {
 		function(callback){
 			db.collection(req.query["shop"]+"_config", function(err, shop_config) {
 				shop_config.findOne({"myshopify_domain": req.query["shop"]}, function(err, shop){
-					callback(null, shop, shop_config)				
+					callback(null, shop, shop_config)
 				})
-			})			
+			})
 		},
 		function(shop, shop_config, callback){
 			getOneTimeChargeStatus(shop, req.query["charge_id"], function(err, chargeAccepted){
@@ -217,19 +216,19 @@ app.get('/application_charges', function(req, res) {
 
 					} else if(data["script_tags"].length ==0 ) {
 						// no script tags are installed so we can assume this is a brand new install and just add one script tag
-						console.log('script tags zero!')					
+						console.log('script tags zero!')
 						installScriptTag(shop, function(err, data) {
 							//console.log(data)
 							res.render("index",{ locals:{installed:true}})
 						})
-					
+
 					} else {
-						// one script tag already exists so this is just the user logging into the app again, so we dont install any more script tags 
+						// one script tag already exists so this is just the user logging into the app again, so we dont install any more script tags
 						console.log('script tags 1!')
-						res.render("index",{ locals:{installed:true}})					
+						res.render("index",{ locals:{installed:true}})
 					}
 				})
-			
+
 			})
 		},
 		function(shop, shop_config, callback){
@@ -246,16 +245,16 @@ app.get('/application_charges', function(req, res) {
 						callback(null, shop)
 					} else if(data["script_tags"].length ==0 ) {
 						// no script tags are installed so we can assume this is a brand new install and just add one script tag
-						console.log('script tags zero!')					
+						console.log('script tags zero!')
 						installScriptTag(shop, function(err, data) {
 							//console.log(data)
 							callback(null, shop)
 						})
-					
+
 					} else {
-						// one script tag already exists so this is just the user logging into the app again, so we dont install any more script tags 
+						// one script tag already exists so this is just the user logging into the app again, so we dont install any more script tags
 						console.log('script tags 1!')
-						callback(null, shop)					
+						callback(null, shop)
 					}
 				})
 		}
@@ -263,7 +262,7 @@ app.get('/application_charges', function(req, res) {
 		 console.log('done with application_charge!')
 		 res.render("index",{ locals:{installed:true}})
 	})
-		
+
 })
 
 app.get('/email', function(req, res) {
@@ -315,10 +314,10 @@ function installScriptTag(shop, callback){
 			//this line shows the response from the Shopify API
 			console.log('response from installScriptTag:')
 			console.log(res.body)
-			//eventually there should be real error-checking here, doing a callback(null) 
+			//eventually there should be real error-checking here, doing a callback(null)
 			//in the meantime which assumes there was no error installing the scriptTags
 			callback(null, res.body)
-	})	
+	})
 }
 
 function getScriptTags(shop, callback){
@@ -333,7 +332,7 @@ function getScriptTags(shop, callback){
 			console.log('response from getScriptTags:')
 			console.log(res.body)
 			callback(null, res.body)
-	})	
+	})
 }
 
 function deleteScriptTag(shop, scripttag_id, callback){
@@ -348,7 +347,7 @@ function deleteScriptTag(shop, scripttag_id, callback){
 			console.log('response from deleteScriptTag:')
 			console.log(res.body)
 			//callback(null, res.body)
-	})	
+	})
 }
 
 function getShopInfo(shop, callback) {
@@ -391,8 +390,8 @@ function createOneTimeCharge(shop, callback){
 					"name": "Contact Form",
 					"price": PRICE,
 					"return_url": internal_domain+"/application_charges?shop="+shop.myshopify_domain,
-					"test": !PROD_MODE							
-				}			
+					"test": !PROD_MODE
+				}
 			}
 			, json:true
 		}, function(req, res){
@@ -416,7 +415,7 @@ function getOneTimeChargeStatus(shop, charge_id, callback){
 			if(res.body['application_charge'].status == 'accepted') {
 				callback(null, true)
 			} else {
-				callback(null, false)			
+				callback(null, false)
 			}
 		}
 	)
